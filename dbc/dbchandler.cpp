@@ -710,8 +710,9 @@ void DBCFile::loadFile(QString fileName)
             }
             if (line.startsWith("SG_ ")) //defines a signal
             {
-                if (!parseSignalLine(line, currentMessage)) numSigFaults++;
-            }
+                if(currentMessage == nullptr) numSigFaults++;
+                else parseSignalLine(line, currentMessage);
+                                }
             if (line.startsWith("BU_:")) //line specifies the nodes on this canbus
             {
                 qDebug() << "Found a BU line";

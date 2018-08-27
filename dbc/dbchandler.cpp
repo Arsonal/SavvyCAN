@@ -328,29 +328,23 @@ void DBCFile::findAttributesByType(DBC_ATTRIBUTE_TYPE typ, QList<DBC_ATTRIBUTE> 
 
 DBC_MESSAGE* DBCFile::parseMessageLine(QString line)
 {
-    QRegularExpression regex;
-    QRegularExpressionMatch match;
-
     DBC_MESSAGE *msgPtr;
+    QStringList tempList = line.split(' '); // Split the line up
+    tempList[2].remove(tempList[2].length()-1, 1);  // Remove : at the end of the message
 
     qDebug() << "Found a BO line";
-    regex.setPattern("^BO\\_ (\\w+) (\\w+) *: (\\w+) (\\w+)");
-    match = regex.match(line);
-    //captured 1 = the ID in decimal
-    //captured 2 = The message name
-    //captured 3 = the message length
-    //captured 4 = the NODE responsible for this message
-    if (match.hasMatch())
-    {
-        DBC_MESSAGE msg;
-        msg.ID = match.captured(1).toULong() & 0x7FFFFFFFul; //the ID is always stored in decimal format
-        msg.name = match.captured(2);
-        msg.len = match.captured(3).toInt();
-        msg.sender = findNodeByName(match.captured(4));
-        messageHandler->addMessage(msg);
-        msgPtr = messageHandler->findMsgByID(msg.ID);
-    }
-    else msgPtr = nullptr;
+    //tempList 1 = the ID in decimal
+    //tempList 2 = The message name
+    //tempList 3 = the message length
+    //tempList 4 = the NODE responsible for this message
+   
+    DBC_MESSAGE msg;
+    msg.ID = tempList[1].toULong() & 0x7FFFFFFFul; //the ID is always stored in decimal format
+    msg.name = tempList[2];
+    msg.len = tempList[3].toInt();
+    msg.sender = findNodeByName(tempList[4]);
+    messageHandler->addMessage(msg);
+    msgPtr = messageHandler->findMsgByID(msg.ID);
     return msgPtr;
 }
 
